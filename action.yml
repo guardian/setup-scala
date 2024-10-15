@@ -1,0 +1,38 @@
+name: "Setup Scala with both Java and sbt"
+description: "Much longer description"
+#inputs:
+#  sbt-runner-version:
+#    description: "The runner version (The actual version is controlled via project/build.properties)"
+#    required: true
+#    default: 1.10.2
+runs:
+  using: "composite"
+  steps:
+    - name: Determine major Java version
+      id: determine-java-version
+      shell: bash
+      run: |
+        if [ ! -f .tool-versions ]; then
+          echo "::error title=Missing .tool-versions file::setup-scala requires an asdf-format .tool-versions file to establish the Java version for the build."
+          exit 1
+        fi
+        MAJOR_JAVA_VERSION=$( grep -Eo 'java [[:alnum:]-]+-[[:digit:]]+' .tool-versions | rev | cut -d'-' -f1 | rev )
+        echo "Using Java $MAJOR_JAVA_VERSION"
+        if [ -z "${MAJOR_JAVA_VERSION}" ]; then
+          echo "::error title=Missing Java version in .tool-versions file::Could not establish the project's required Java version - the '.tool-versions' file should have a line like 'java corretto-21.0.3.9.1'."
+          exit 1
+        fi
+        
+        cat << EndOfFile >> $GITHUB_OUTPUT
+        major_java_version=$MAJOR_JAVA_VERSION
+        EndOfFile
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ steps.determine-java-version.outputs.major_java_version }}
+        distribution: "corretto"
+        cache: sbt
+
+    - name: Setup sbt
+      uses: sbt/setup-sbt@v1.1.0
