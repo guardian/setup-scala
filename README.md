@@ -12,7 +12,7 @@ requires that projects specify their Java version with an [`asdf`](https://asdf-
 
 ##### Only Java _major_ version is respected
 
-Note that although `asdf` requires a fully-specified Java version (eg `21.0.3.9.1`) in the `.tool-versions` file,
-currently the workflow will only match the *major* version of Java specified in the file (eg `21`), and will _always_ use the AWS Corretto distribution of Java.
+Although `asdf` requires a fully-specified Java version (eg `21.0.3.9.1`) in the `.tool-versions` file,
+currently the workflow will only match the *major* version of Java specified in the file (eg `21`).
 
 This is due to [limitations](https://github.com/actions/setup-java/issues/615) in [`actions/setup-java`](https://github.com/actions/setup-java).
