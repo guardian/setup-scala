@@ -1,6 +1,10 @@
 name: "Setup Scala with both Java and sbt"
 description: "Much longer description"
 inputs:
+  tool-versions-folder:
+    description: 'Specify the folder containing .tool-versions - for instance "." or "example-folder/a/b"'
+    required: false
+    default: '.'
   major-java-version:
     description: 'Specify a major Java version (21, 11, etc) as an alternative to reading one from .tool-versions'
     required: false
@@ -12,17 +16,18 @@ runs:
       id: determine-java-version
       shell: bash
       env:
+        TOOL_VERSIONS_FOLDER: ${{ inputs.tool-versions-folder }}
         MAJOR_JAVA_VERSION: ${{ inputs.major-java-version }}
       run: |
         if [ ${MAJOR_JAVA_VERSION} ]; then
           echo "Reading Java version from the 'major-java-version' input property, rather than .tool-versions"
         else
-          if [ ! -f .tool-versions ]; then
+          TOOL_VERSIONS_FILE="$TOOL_VERSIONS_FOLDER/.tool-versions"
+          if [ ! -f "${TOOL_VERSIONS_FILE}" ]; then
             echo "::error title=Missing .tool-versions file::setup-scala prefers an asdf-format .tool-versions file to establish the Java version for the build - a standard file that is understood by many different tools. Failing this, specify the 'major-java-version' parameter."
-
             exit 1
           fi
-          MAJOR_JAVA_VERSION=$( grep -Eo 'java [[:alnum:]-]+-[[:digit:]]+' .tool-versions | rev | cut -d'-' -f1 | rev )
+          MAJOR_JAVA_VERSION=$( grep -Eo 'java [[:alnum:]-]+-[[:digit:]]+' "${TOOL_VERSIONS_FILE}" | rev | cut -d'-' -f1 | rev )
           
           if [ -z "${MAJOR_JAVA_VERSION}" ]; then
             echo "::error title=Missing Java version in .tool-versions file::Could not establish the project's required Java version - the '.tool-versions' file should have a line like 'java corretto-21.0.3.9.1'."
