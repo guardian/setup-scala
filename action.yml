@@ -14,11 +14,12 @@ runs:
       env:
         MAJOR_JAVA_VERSION: ${{ inputs.major-java-version }}
       run: |
-        if [ ${MAJOR_JAVA_VERSION:-} ]; then
+        if [ ${MAJOR_JAVA_VERSION} ]; then
           echo "Reading Java version from the 'major-java-version' input property, rather than .tool-versions"
         else
           if [ ! -f .tool-versions ]; then
-            echo "::error title=Missing .tool-versions file::setup-scala requires an asdf-format .tool-versions file to establish the Java version for the build."
+            echo "::error title=Missing .tool-versions file::setup-scala prefers an asdf-format .tool-versions file to establish the Java version for the build - a standard file that is understood by many different tools. Failing this, specify the 'major-java-version' parameter."
+
             exit 1
           fi
           MAJOR_JAVA_VERSION=$( grep -Eo 'java [[:alnum:]-]+-[[:digit:]]+' .tool-versions | rev | cut -d'-' -f1 | rev )
