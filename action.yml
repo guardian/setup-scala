@@ -1,27 +1,35 @@
 name: "Setup Scala with both Java and sbt"
 description: "Much longer description"
-#inputs:
-#  sbt-runner-version:
-#    description: "The runner version (The actual version is controlled via project/build.properties)"
-#    required: true
-#    default: 1.10.2
+inputs:
+  major-java-version:
+    description: 'Specify a major Java version (21, 11, etc) as an alternative to reading one from .tool-versions'
+    required: false
+    default: ''
 runs:
   using: "composite"
   steps:
     - name: Determine major Java version
       id: determine-java-version
       shell: bash
+      env:
+        MAJOR_JAVA_VERSION: ${{ inputs.major-java-version }}
       run: |
-        if [ ! -f .tool-versions ]; then
-          echo "::error title=Missing .tool-versions file::setup-scala requires an asdf-format .tool-versions file to establish the Java version for the build."
-          exit 1
+        if [ ${MAJOR_JAVA_VERSION:-} ]; then
+          echo "Reading Java version from the 'major-java-version' input property, rather than .tool-versions"
+        else
+          if [ ! -f .tool-versions ]; then
+            echo "::error title=Missing .tool-versions file::setup-scala requires an asdf-format .tool-versions file to establish the Java version for the build."
+            exit 1
+          fi
+          MAJOR_JAVA_VERSION=$( grep -Eo 'java [[:alnum:]-]+-[[:digit:]]+' .tool-versions | rev | cut -d'-' -f1 | rev )
+          
+          if [ -z "${MAJOR_JAVA_VERSION}" ]; then
+            echo "::error title=Missing Java version in .tool-versions file::Could not establish the project's required Java version - the '.tool-versions' file should have a line like 'java corretto-21.0.3.9.1'."
+            exit 1
+          fi
         fi
-        MAJOR_JAVA_VERSION=$( grep -Eo 'java [[:alnum:]-]+-[[:digit:]]+' .tool-versions | rev | cut -d'-' -f1 | rev )
+
         echo "Using Java $MAJOR_JAVA_VERSION"
-        if [ -z "${MAJOR_JAVA_VERSION}" ]; then
-          echo "::error title=Missing Java version in .tool-versions file::Could not establish the project's required Java version - the '.tool-versions' file should have a line like 'java corretto-21.0.3.9.1'."
-          exit 1
-        fi
         
         cat << EndOfFile >> $GITHUB_OUTPUT
         major_java_version=$MAJOR_JAVA_VERSION
@@ -35,4 +43,4 @@ runs:
         cache: sbt
 
     - name: Setup sbt
-      uses: sbt/setup-sbt@v1.1.0
+      uses: sbt/setup-sbt@v1.1.5
