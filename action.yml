@@ -37,11 +37,11 @@ runs:
         EndOfFile
 
     - name: Setup Java
-      uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5.4.0
+      uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
       with:
         java-version: ${{ steps.determine-java-version.outputs.major_java_version }}
         distribution: "corretto"
         cache: sbt
 
     - name: Setup sbt
-      uses: sbt/setup-sbt@3afe9cf056c5d139bfc46579af1192d77a2f0821 # v1.4.0
+      uses: sbt/setup-sbt@f6db8ab474efba716fc7f04441ab33714e4825af # v1.5.4
