@@ -18,15 +18,15 @@ Get rid of this:
 and replace it with this:
 
 ```yaml
-      - uses: guardian/setup-scala@v1
+      - uses: guardian/setup-scala@v2
 ```
 
 Specifically:
 
 * In your GitHub Action workflow definition (eg `ci.yml`), under `steps:`:
   * Remove the `setup-java` step and its config (and `setup-sbt` if you have it)
-  * Add `- uses: guardian/setup-scala@v1` where the `actions/setup-java` config was ([example](https://github.com/guardian/etag-caching/blob/ff6c7d1507e6ef951f841100abf132bd4cacbb62/.github/workflows/ci.yml#L18))
-* Add a `.tool-versions` file if you don't already have one, specifying the version of Java you want to use ([example](https://github.com/guardian/etag-caching/blob/ff6c7d1507e6ef951f841100abf132bd4cacbb62/.tool-versions))
+  * Add `- uses: guardian/setup-scala@v2` where the `actions/setup-java` config was ([example](https://github.com/guardian/prout/blob/1bee0f158601d85697739151c4d4dce1bf28062b/.github/workflows/ci.yml#L18))
+* Add a `.tool-versions` file if you don't already have one, specifying the version of Java you want to use ([example](https://github.com/guardian/setup-scala/blob/56ec952f11409b28f4f7ae8d442e4d6deb87fc68/.tool-versions#L1))
 
 [Example PR](https://github.com/guardian/etag-caching/pull/60) removing `setup-java` and installing `setup-scala`.
 
